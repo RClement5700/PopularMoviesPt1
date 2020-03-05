@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 "Error retrieving data", Toast.LENGTH_LONG);
         getImages("popular");
 
+
 //        HashMap<Object, Object> moviesByPopularity  = mapMovies("popular",
 //                "popularity");
 
@@ -67,16 +68,15 @@ public class MainActivity extends AppCompatActivity {
                             jsonObject = new JSONObject(response);
                             jsonArray = jsonObject.getJSONArray("results");
                             for (int i = 0; i < jsonArray.length(); i++) {
-                                imagesList.add(
-                                        "http://image.tmdb.org/t/p/w185//" + jsonArray
+                                imagesList.add("http://image.tmdb.org/t/p/w185//" + jsonArray
                                                 .getJSONObject(i)
                                                 .getString("poster_path")
                                 );
                             }
                             //create new adapter
                             moviesAdapter = new MoviesRecyclerViewAdapter(imagesList);
-                            movies.swapAdapter(moviesAdapter, true);
-                            System.err.print("size: " + imagesList.size());
+                            movies.setAdapter(moviesAdapter);
+                            System.err.println("size: " + imagesList.size());
                         }
                         catch(JSONException e) {
                             e.printStackTrace();
@@ -91,11 +91,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Add the request to the RequestQueue.
         requestQueue.add(stringRequest);
-        requestQueue.start();
+        //requestQueue.start();
     }
 
 
-    public HashMap<Object, Object> mapMovies(String query, final String jsonQuery) {
+    public void mapMovies(String query, final String jsonQuery) {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         String URL = BASE_URL + query + "?api_key=" + API_KEY;
@@ -126,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Add the request to the RequestQueue.
         requestQueue.add(stringRequest);
-        requestQueue.start();
-        return map;
+        //requestQueue.start();
     }
 }
