@@ -2,8 +2,6 @@ package android.example.popularmoviespt1;
 
 import android.example.popularmoviespt1.utils.MoviesRecyclerViewAdapter;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //progressBar= (ProgressBar) findViewById(R.id.progress_bar);
         movies = (RecyclerView) findViewById(R.id.rv_movies);
         layoutManager = new LinearLayoutManager(this);
         moviesAdapter =
@@ -75,12 +72,11 @@ public class MainActivity extends AppCompatActivity {
                                                 .getJSONObject(i)
                                                 .getString("poster_path")
                                 );
-                                //System.err.println(imagesList.get(i));
                             }
                             //create new adapter
                             moviesAdapter = new MoviesRecyclerViewAdapter(imagesList);
                             movies.swapAdapter(moviesAdapter, true);
-//                            progressBar.setVisibility(View.INVISIBLE);
+                            System.err.print("size: " + imagesList.size());
                         }
                         catch(JSONException e) {
                             e.printStackTrace();
@@ -108,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        //System.err.println("Response is: "+ response);
                         try {
                             jsonObject = new JSONObject(response);
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
