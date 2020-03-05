@@ -43,13 +43,6 @@ public class MainActivity extends AppCompatActivity {
         movies.setAdapter(moviesAdapter);
         toast = Toast.makeText(this,
                 "Error retrieving data", Toast.LENGTH_LONG);
-
-
-//        HashMap<Object, Object> moviesByPopularity  = mapMovies("popular",
-//                "popularity");
-
-//        HashMap<Object, Object> moviesByRating      = mapMovies("top_rated",
-//                "vote_average");
     }
 
 
@@ -61,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        //System.err.println("Response is: "+ response);
                         try {
                             jsonObject = new JSONObject(response);
                             jsonArray = jsonObject.getJSONArray("results");
@@ -108,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 map.put(jsonArray.getJSONObject(i).get("original_title"),
                                         jsonArray.getJSONObject(i).get(jsonQuery));
-                                //instantiate movieadapter with jsonArray as dataset
                             }
                         }
                         catch(JSONException e) {
@@ -124,6 +115,5 @@ public class MainActivity extends AppCompatActivity {
 
         // Add the request to the RequestQueue.
         requestQueue.add(stringRequest);
-        //requestQueue.start();
     }
 }

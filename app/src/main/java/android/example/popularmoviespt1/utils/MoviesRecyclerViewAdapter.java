@@ -18,8 +18,6 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter
 
     ArrayList<String> images;
 
-    //update Adapter so arrayList is not required
-
     public MoviesRecyclerViewAdapter(ArrayList<String> images) {
         this.images = images;
     }
