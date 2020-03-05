@@ -1,7 +1,6 @@
 package android.example.popularmoviespt1.utils;
 
 import android.example.popularmoviespt1.R;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,9 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter
     public void onBindViewHolder(@NonNull MoviesRecyclerViewHolder holder, int position) {
         //use picasso here to set image resource
         Picasso.get()
-                .load(images.get(0))
+                .load(images.get(position))
+                .fit()
+                .placeholder(R.mipmap.ic_launcher)
                 .into(holder.imageView);
     }
 

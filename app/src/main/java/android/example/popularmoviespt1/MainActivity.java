@@ -27,8 +27,6 @@ public class MainActivity extends AppCompatActivity {
     JSONArray jsonArray;
     Toast toast;
     RecyclerView movies;
-    LinearLayoutManager layoutManager;
-    MoviesRecyclerViewAdapter moviesAdapter;
     final String API_KEY = "7d20fe59c0f72a12c165f5867aa3cb70";
     final String BASE_URL = "https://api.themoviedb.org/3/movie/";
     @Override
@@ -37,14 +35,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         movies = (RecyclerView) findViewById(R.id.rv_movies);
-        layoutManager = new LinearLayoutManager(this);
-        moviesAdapter =
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        MoviesRecyclerViewAdapter moviesAdapter =
                 new MoviesRecyclerViewAdapter(new ArrayList<String>());
+        getImages("popular");
         movies.setLayoutManager(layoutManager);
         movies.setAdapter(moviesAdapter);
         toast = Toast.makeText(this,
                 "Error retrieving data", Toast.LENGTH_LONG);
-        getImages("popular");
 
 
 //        HashMap<Object, Object> moviesByPopularity  = mapMovies("popular",
@@ -74,8 +72,9 @@ public class MainActivity extends AppCompatActivity {
                                 );
                             }
                             //create new adapter
-                            moviesAdapter = new MoviesRecyclerViewAdapter(imagesList);
-                            movies.setAdapter(moviesAdapter);
+                            MoviesRecyclerViewAdapter newAdapter =
+                                    new MoviesRecyclerViewAdapter(imagesList);
+                            movies.swapAdapter(newAdapter, false);
                             System.err.println("size: " + imagesList.size());
                         }
                         catch(JSONException e) {
@@ -91,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Add the request to the RequestQueue.
         requestQueue.add(stringRequest);
-        //requestQueue.start();
     }
 
 
