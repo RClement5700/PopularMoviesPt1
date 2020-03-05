@@ -2,6 +2,8 @@ package android.example.popularmoviespt1;
 
 import android.example.popularmoviespt1.utils.MoviesRecyclerViewAdapter;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     JSONArray jsonArray;
     Toast toast;
     RecyclerView movies;
+    ProgressBar progressBar;
     final String API_KEY = "7d20fe59c0f72a12c165f5867aa3cb70";
     final String BASE_URL = "https://api.themoviedb.org/3/movie/";
     @Override
@@ -34,13 +37,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         movies = (RecyclerView) findViewById(R.id.rv_movies);
+        movies.setVisibility(View.INVISIBLE);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         MoviesRecyclerViewAdapter moviesAdapter =
                 new MoviesRecyclerViewAdapter(new ArrayList<String>());
-        getImages("popular");
         movies.setLayoutManager(layoutManager);
         movies.setAdapter(moviesAdapter);
+        getImages("popular");
         toast = Toast.makeText(this,
                 "Error retrieving data", Toast.LENGTH_LONG);
     }
@@ -58,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                             jsonObject = new JSONObject(response);
                             jsonArray = jsonObject.getJSONArray("results");
                             for (int i = 0; i < jsonArray.length(); i++) {
-                                imagesList.add("http://image.tmdb.org/t/p/w185//" + jsonArray
+                                imagesList.add("https://image.tmdb.org/t/p/w185//" + jsonArray
                                                 .getJSONObject(i)
                                                 .getString("poster_path")
                                 );
@@ -66,8 +71,9 @@ public class MainActivity extends AppCompatActivity {
                             //create new adapter
                             MoviesRecyclerViewAdapter newAdapter =
                                     new MoviesRecyclerViewAdapter(imagesList);
-                            movies.swapAdapter(newAdapter, false);
-                            System.err.println("size: " + imagesList.size());
+                            movies.swapAdapter(newAdapter,true);
+                            progressBar.setVisibility(View.INVISIBLE);
+                            movies.setVisibility(View.VISIBLE);
                         }
                         catch(JSONException e) {
                             e.printStackTrace();

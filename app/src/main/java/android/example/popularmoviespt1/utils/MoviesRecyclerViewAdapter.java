@@ -36,7 +36,6 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter
         //use picasso here to set image resource
         Picasso.get()
                 .load(images.get(position))
-                .fit()
                 .placeholder(R.mipmap.ic_launcher)
                 .into(holder.imageView);
     }
