@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                             MoviesRecyclerViewAdapter newAdapter =
                                     new MoviesRecyclerViewAdapter(imagesList);
                             movies.swapAdapter(newAdapter,true);
-                            progressBar.setVisibility(View.INVISIBLE);
+                            progressBar.setVisibility(View.GONE);
                             movies.setVisibility(View.VISIBLE);
                         }
                         catch(JSONException e) {

@@ -1,5 +1,7 @@
 package android.example.popularmoviespt1.utils;
 
+import android.content.Intent;
+import android.example.popularmoviespt1.DetailsActivity;
 import android.example.popularmoviespt1.R;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,8 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter
     public MoviesRecyclerViewAdapter(ArrayList<String> images) {
         this.images = images;
     }
+
+
 
     @NonNull
     @Override
@@ -46,11 +50,20 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter
     }
 
 
-    class MoviesRecyclerViewHolder extends RecyclerView.ViewHolder {
+    class MoviesRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView imageView;
         public MoviesRecyclerViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.iv_movie_poster);
+            itemView.setClickable(true);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            //pass details to DetailsActivity via intent
+            v.getContext().startActivity(new Intent(v.getContext(),
+                    DetailsActivity.class));
         }
     }
 }
