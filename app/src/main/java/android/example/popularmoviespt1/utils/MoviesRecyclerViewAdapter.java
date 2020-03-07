@@ -29,9 +29,15 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter
     @NonNull
     @Override
     public MoviesRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.list_item, parent, false);
+        view.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
         return new MoviesRecyclerViewHolder(view);
     }
 
@@ -62,8 +68,11 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter
         @Override
         public void onClick(View v) {
             //pass details to DetailsActivity via intent
-            v.getContext().startActivity(new Intent(v.getContext(),
-                    DetailsActivity.class));
+            Intent intent = new Intent(v.getContext(), DetailsActivity.class);
+            System.err.println(imageView.getDrawable());
+            //Drawable drawable = Drawable.createFromPath()
+            intent.putExtra("resId", R.drawable.ic_launcher_background);
+            v.getContext().startActivity(intent);
         }
     }
 }

@@ -22,7 +22,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
     JSONObject jsonObject;
@@ -40,11 +39,8 @@ public class MainActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         movies = (RecyclerView) findViewById(R.id.rv_movies);
         movies.setVisibility(View.INVISIBLE);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        MoviesRecyclerViewAdapter moviesAdapter =
-                new MoviesRecyclerViewAdapter(new ArrayList<String>());
-        movies.setLayoutManager(layoutManager);
-        movies.setAdapter(moviesAdapter);
+        movies.setLayoutManager(new LinearLayoutManager(this));
+        movies.setAdapter(new MoviesRecyclerViewAdapter(new ArrayList<String>()));
         getImages("popular");
         toast = Toast.makeText(this,
                 "Error retrieving data", Toast.LENGTH_LONG);
@@ -63,10 +59,15 @@ public class MainActivity extends AppCompatActivity {
                             jsonObject = new JSONObject(response);
                             jsonArray = jsonObject.getJSONArray("results");
                             for (int i = 0; i < jsonArray.length(); i++) {
-                                imagesList.add("https://image.tmdb.org/t/p/w185//" + jsonArray
-                                                .getJSONObject(i)
-                                                .getString("poster_path")
-                                );
+                                JSONObject currentObject = jsonArray.getJSONObject(i);
+                                String posterURL
+                                        = "https://image.tmdb.org/t/p/w780//" +
+                                        currentObject.getString("poster_path");
+                                imagesList.add(posterURL);
+                                //original_title
+                                //vote_average
+                                //overview
+                                //release_date
                             }
                             //create new adapter
                             MoviesRecyclerViewAdapter newAdapter =
@@ -91,35 +92,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void mapMovies(String query, final String jsonQuery) {
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-
-        String URL = BASE_URL + query + "?api_key=" + API_KEY;
-        final HashMap<Object, Object> map = new HashMap<>();
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            jsonObject = new JSONObject(response);
-                            JSONArray jsonArray = jsonObject.getJSONArray("results");
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                map.put(jsonArray.getJSONObject(i).get("original_title"),
-                                        jsonArray.getJSONObject(i).get(jsonQuery));
-                            }
-                        }
-                        catch(JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                toast.show();
-            }
-        });
-
-        // Add the request to the RequestQueue.
-        requestQueue.add(stringRequest);
-    }
+//    public void mapMovies(String query, final String jsonQuery) {
+//        RequestQueue requestQueue = Volley.newRequestQueue(this);
+//
+//        String URL = BASE_URL + query + "?api_key=" + API_KEY;
+//        final HashMap<Object, Object> map = new HashMap<>();
+//        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        try {
+//                            jsonObject = new JSONObject(response);
+//                            jsonArray = jsonObject.getJSONArray("results");
+//                            for (int i = 0; i < jsonArray.length(); i++) {
+//                                map.put(jsonArray.getJSONObject(i).get("original_title"),
+//                                        jsonArray.getJSONObject(i).get(jsonQuery));
+//                            }
+//                        }
+//                        catch(JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                toast.show();
+//            }
+//        });
+//
+//        // Add the request to the RequestQueue.
+//        requestQueue.add(stringRequest);
+//    }
 }
