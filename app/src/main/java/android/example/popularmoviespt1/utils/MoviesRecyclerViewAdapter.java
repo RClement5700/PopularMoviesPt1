@@ -18,10 +18,10 @@ import java.util.ArrayList;
 public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter
         <MoviesRecyclerViewAdapter.MoviesRecyclerViewHolder> {
 
-    ArrayList<String> images;
+    ArrayList<Movie> movies;
 
-    public MoviesRecyclerViewAdapter(ArrayList<String> images) {
-        this.images = images;
+    public MoviesRecyclerViewAdapter(ArrayList<Movie> movies) {
+        this.movies = movies;
     }
 
 
@@ -31,48 +31,42 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter
     public MoviesRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.list_item, parent, false);
-        view.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
         return new MoviesRecyclerViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MoviesRecyclerViewHolder holder, int position) {
-        //use picasso here to set image resource
+    public void onBindViewHolder(@NonNull final MoviesRecyclerViewHolder holder, final int position) {
+
         Picasso.get()
-                .load(images.get(position))
+                .load(movies.get(position).posterURL)
                 .placeholder(R.mipmap.ic_launcher)
                 .into(holder.imageView);
+        holder.imageView.setClickable(true);
+        holder.imageView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), DetailsActivity.class);
+                intent.putExtra("movie", movies.get(position));
+                v.getContext().startActivity(intent);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return images.size();
+        return movies.size();
     }
 
 
-    class MoviesRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class MoviesRecyclerViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
+
         public MoviesRecyclerViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.iv_movie_poster);
-            itemView.setClickable(true);
-            itemView.setOnClickListener(this);
+
         }
 
-        @Override
-        public void onClick(View v) {
-            //pass details to DetailsActivity via intent
-            Intent intent = new Intent(v.getContext(), DetailsActivity.class);
-            System.err.println(imageView.getDrawable());
-            //Drawable drawable = Drawable.createFromPath()
-            intent.putExtra("resId", R.drawable.ic_launcher_background);
-            v.getContext().startActivity(intent);
-        }
     }
 }

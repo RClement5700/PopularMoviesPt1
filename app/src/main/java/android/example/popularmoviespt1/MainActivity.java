@@ -1,5 +1,6 @@
 package android.example.popularmoviespt1;
 
+import android.example.popularmoviespt1.utils.Movie;
 import android.example.popularmoviespt1.utils.MoviesRecyclerViewAdapter;
 import android.os.Bundle;
 import android.view.View;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         movies = (RecyclerView) findViewById(R.id.rv_movies);
         movies.setVisibility(View.INVISIBLE);
         movies.setLayoutManager(new LinearLayoutManager(this));
-        movies.setAdapter(new MoviesRecyclerViewAdapter(new ArrayList<String>()));
+        movies.setAdapter(new MoviesRecyclerViewAdapter(new ArrayList<Movie>()));
         getImages("popular");
         toast = Toast.makeText(this,
                 "Error retrieving data", Toast.LENGTH_LONG);
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     public void getImages(String query) {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         String URL = BASE_URL + query + "?api_key=" + API_KEY;
-        final ArrayList<String> imagesList = new ArrayList<>();
+        final ArrayList<Movie> moviesList = new ArrayList<>();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, URL,
                 new Response.Listener<String>() {
                     @Override
@@ -60,10 +61,16 @@ public class MainActivity extends AppCompatActivity {
                             jsonArray = jsonObject.getJSONArray("results");
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject currentObject = jsonArray.getJSONObject(i);
+                                String title = currentObject.getString("original_title");
+                                String rating = currentObject.getString("vote_average");
+                                String overview = currentObject.getString("overview");
+                                String releaseDate = currentObject.getString("release_date");
                                 String posterURL
                                         = "https://image.tmdb.org/t/p/w780//" +
                                         currentObject.getString("poster_path");
-                                imagesList.add(posterURL);
+                                Movie currentMovie = new Movie(title, rating, overview, releaseDate, posterURL);
+                                moviesList.add(currentMovie);
+
                                 //original_title
                                 //vote_average
                                 //overview
@@ -71,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                             //create new adapter
                             MoviesRecyclerViewAdapter newAdapter =
-                                    new MoviesRecyclerViewAdapter(imagesList);
+                                    new MoviesRecyclerViewAdapter(moviesList);
                             movies.swapAdapter(newAdapter,true);
                             progressBar.setVisibility(View.GONE);
                             movies.setVisibility(View.VISIBLE);
