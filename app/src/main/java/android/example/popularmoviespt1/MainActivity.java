@@ -11,7 +11,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         movies = (RecyclerView) findViewById(R.id.rv_movies);
         movies.setVisibility(View.INVISIBLE);
-        movies.setLayoutManager(new LinearLayoutManager(this));
+        movies.setLayoutManager(new GridLayoutManager(this, 2));
         movies.setAdapter(new MoviesRecyclerViewAdapter(new ArrayList<Movie>()));
         getImages("popular");
         toast = Toast.makeText(this,
