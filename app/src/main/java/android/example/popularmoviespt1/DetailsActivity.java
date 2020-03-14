@@ -18,7 +18,7 @@ public class DetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
         ImageView imageView = (ImageView) findViewById(R.id.iv_poster_thumbnail);
-        TextView movieTitle = (TextView) findViewById(R.id.movie_title);
+        TextView tv_title = (TextView) findViewById(R.id.movie_title);
         TextView tv_rating = (TextView) findViewById(R.id.rating);
         TextView tv_summary = (TextView) findViewById(R.id.summary);
         TextView tv_release_date = (TextView) findViewById(R.id.release_date);
@@ -31,10 +31,15 @@ public class DetailsActivity extends AppCompatActivity {
                     .load(poster_path)
                     .placeholder(R.mipmap.ic_launcher)
                     .into(imageView);
-            movieTitle.setText(movie.getTitle());
-            tv_rating.setText(movie.getRating());
-            tv_summary.setText(movie.getOverview());
-            tv_release_date.setText(movie.getReleaseDate());
+            String title = tv_title.getText().toString() + " " + movie.getTitle();
+            String rating = tv_rating.getText().toString() + " " + movie.getRating();
+            String summary = tv_summary.getText().toString() + " " + movie.getOverview();
+            String releaseDate = tv_release_date.getText().toString() + " " + movie.getReleaseDate();
+
+            tv_title.setText(title);
+            tv_rating.setText(rating);
+            tv_summary.setText(summary);
+            tv_release_date.setText(releaseDate);
         }
     }
 }

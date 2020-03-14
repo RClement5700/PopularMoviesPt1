@@ -4,7 +4,10 @@ import android.example.popularmoviespt1.utils.Movie;
 import android.example.popularmoviespt1.utils.MoviesRecyclerViewAdapter;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     JSONArray jsonArray;
     Toast toast;
     RecyclerView movies;
+    Spinner spinner_sort;
     ProgressBar progressBar;
     final String API_KEY = "7d20fe59c0f72a12c165f5867aa3cb70";
     final String BASE_URL = "https://api.themoviedb.org/3/movie/";
@@ -37,6 +41,29 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        spinner_sort = (Spinner) findViewById(R.id.spinner_sort);
+        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.sort_order, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner_sort.setAdapter(adapter);
+        spinner_sort.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (i == 1) {
+                    getImages("top_rated");
+                }
+                if (i == 0) {
+                    getImages("popular");
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                //do nothing
+            }
+        });
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         movies = (RecyclerView) findViewById(R.id.rv_movies);
         movies.setVisibility(View.INVISIBLE);
@@ -46,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
         toast = Toast.makeText(this,
                 "Error retrieving data", Toast.LENGTH_LONG);
     }
-
 
     public void getImages(String query) {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -70,11 +96,6 @@ public class MainActivity extends AppCompatActivity {
                                         currentObject.getString("poster_path");
                                 Movie currentMovie = new Movie(title, rating, overview, releaseDate, posterURL);
                                 moviesList.add(currentMovie);
-
-                                //original_title
-                                //vote_average
-                                //overview
-                                //release_date
                             }
                             //create new adapter
                             MoviesRecyclerViewAdapter newAdapter =
@@ -97,37 +118,4 @@ public class MainActivity extends AppCompatActivity {
         // Add the request to the RequestQueue.
         requestQueue.add(stringRequest);
     }
-
-
-//    public void mapMovies(String query, final String jsonQuery) {
-//        RequestQueue requestQueue = Volley.newRequestQueue(this);
-//
-//        String URL = BASE_URL + query + "?api_key=" + API_KEY;
-//        final HashMap<Object, Object> map = new HashMap<>();
-//        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        try {
-//                            jsonObject = new JSONObject(response);
-//                            jsonArray = jsonObject.getJSONArray("results");
-//                            for (int i = 0; i < jsonArray.length(); i++) {
-//                                map.put(jsonArray.getJSONObject(i).get("original_title"),
-//                                        jsonArray.getJSONObject(i).get(jsonQuery));
-//                            }
-//                        }
-//                        catch(JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                toast.show();
-//            }
-//        });
-//
-//        // Add the request to the RequestQueue.
-//        requestQueue.add(stringRequest);
-//    }
 }

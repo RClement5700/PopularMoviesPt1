@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">PopularMoviesPt1</string>
-    <string name="movie_title">movie_title</string>
-    <string name="vote_average">rating</string>
-    <string name="overview">summary</string>
-    <string name="release_date">release date</string>
-
+    <string name="movie_title">Title: </string>
+    <string name="vote_average">Rating: </string>
+    <string name="overview">Summary: </string>
+    <string name="release_date">Release Date: </string>
 </resources>
