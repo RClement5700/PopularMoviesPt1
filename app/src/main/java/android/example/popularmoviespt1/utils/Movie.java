@@ -5,14 +5,23 @@ import java.io.Serializable;
 public class Movie implements Serializable {
 
 
-    String title, rating, overview, releaseDate, posterURL;
+    String id, title, rating, overview, releaseDate, posterURL;
 
-    public Movie(String title, String rating, String overview, String releaseDate, String posterURL) {
+    public Movie(String id, String title, String rating, String overview, String releaseDate, String posterURL) {
+        this.id = id;
         this.title = title;
         this.rating = rating;
         this.overview = overview;
         this.releaseDate = releaseDate;
         this.posterURL = posterURL;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {

@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView movies;
     Spinner spinner_sort;
     ProgressBar progressBar;
-    final String API_KEY = "";
+    final String API_KEY = "7d20fe59c0f72a12c165f5867aa3cb70";
     final String BASE_URL = "https://api.themoviedb.org/3/movie/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,10 +91,11 @@ public class MainActivity extends AppCompatActivity {
                                 String rating = currentObject.getString("vote_average");
                                 String overview = currentObject.getString("overview");
                                 String releaseDate = currentObject.getString("release_date");
+                                String id = currentObject.getString("id");
                                 String posterURL
                                         = "https://image.tmdb.org/t/p/w780//" +
                                         currentObject.getString("poster_path");
-                                Movie currentMovie = new Movie(title, rating, overview, releaseDate, posterURL);
+                                Movie currentMovie = new Movie(id, title, rating, overview, releaseDate, posterURL);
                                 moviesList.add(currentMovie);
                             }
                             //create new adapter
