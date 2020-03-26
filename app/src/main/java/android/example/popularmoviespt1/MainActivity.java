@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 //do nothing
             }
         });
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        progressBar = (ProgressBar) findViewById(R.id.movies_progress_bar);
         movies = (RecyclerView) findViewById(R.id.rv_movies);
         movies.setVisibility(View.INVISIBLE);
         movies.setLayoutManager(new GridLayoutManager(this, 2));
