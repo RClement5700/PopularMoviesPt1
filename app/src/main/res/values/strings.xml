@@ -3,9 +3,9 @@
     <string name="movie_title">Title: </string>
     <string name="overview">Summary: </string>
     <string name="year">Release Year: </string>
-    <string name="length">Film Length: </string>
+    <string name="reviews">Reviews: </string>
     <string name="rating">Film Rating: </string>
     <string name="trailers">Trailers: </string>
-
+    <string name="underscore">_______________________________</string>
 
 </resources>

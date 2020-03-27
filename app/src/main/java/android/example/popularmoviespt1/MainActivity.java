@@ -1,5 +1,6 @@
 package android.example.popularmoviespt1;
 
+import android.content.res.Configuration;
 import android.example.popularmoviespt1.utils.Movie;
 import android.example.popularmoviespt1.utils.MoviesRecyclerViewAdapter;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
@@ -40,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         spinner_sort = (Spinner) findViewById(R.id.spinner_sort);
         final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.sort_order, android.R.layout.simple_spinner_item);
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
                                 String posterURL
                                         = "https://image.tmdb.org/t/p/w780//" +
                                         currentObject.getString("poster_path");
+
                                 Movie currentMovie = new Movie(id, title, rating, overview, releaseDate, posterURL);
                                 moviesList.add(currentMovie);
                             }
@@ -104,6 +106,14 @@ public class MainActivity extends AppCompatActivity {
                             movies.swapAdapter(newAdapter,true);
                             progressBar.setVisibility(View.GONE);
                             movies.setVisibility(View.VISIBLE);
+                            if (getApplicationContext().getResources().getConfiguration().orientation
+                                == Configuration.ORIENTATION_LANDSCAPE) {
+                                LinearLayoutManager llm = new LinearLayoutManager(getParent());
+                                llm.canScrollHorizontally();
+                                llm.setOrientation(RecyclerView.HORIZONTAL);
+                                movies.setLayoutManager(llm);
+                                movies.setHasFixedSize(true);
+                            }
                         }
                         catch(JSONException e) {
                             e.printStackTrace();

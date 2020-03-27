@@ -7,7 +7,8 @@ public class Movie implements Serializable {
 
     String id, title, rating, overview, releaseDate, posterURL;
 
-    public Movie(String id, String title, String rating, String overview, String releaseDate, String posterURL) {
+    public Movie(String id, String title, String rating, String overview, String releaseDate,
+                 String posterURL) {
         this.id = id;
         this.title = title;
         this.rating = rating;
