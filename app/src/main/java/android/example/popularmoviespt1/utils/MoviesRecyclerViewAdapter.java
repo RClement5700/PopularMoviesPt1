@@ -36,7 +36,6 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter
 
     @Override
     public void onBindViewHolder(@NonNull final MoviesRecyclerViewHolder holder, final int position) {
-
         Picasso.get()
                 .load(movies.get(position).posterURL)
                 .placeholder(R.mipmap.ic_launcher)
@@ -56,6 +55,11 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter
     @Override
     public int getItemCount() {
         return movies.size();
+    }
+
+
+    public void setMovies(ArrayList<Movie> movies) {
+        this.movies = movies;
     }
 
 

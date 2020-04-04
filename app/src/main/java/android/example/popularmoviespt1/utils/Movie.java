@@ -16,7 +16,6 @@ public class Movie implements Serializable {
         this.releaseDate = releaseDate;
         this.posterURL = posterURL;
     }
-
     public String getId() {
         return id;
     }

@@ -1,6 +1,7 @@
 package android.example.popularmoviespt1;
 
 import android.content.res.Configuration;
+import android.example.popularmoviespt1.utils.FavoriteDB;
 import android.example.popularmoviespt1.utils.Movie;
 import android.example.popularmoviespt1.utils.MoviesRecyclerViewAdapter;
 import android.os.Bundle;
@@ -29,6 +30,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+//import android.example.popularmoviespt1.utils.FavoriteDB;
+
 public class MainActivity extends AppCompatActivity {
     JSONObject jsonObject;
     JSONArray jsonArray;
@@ -38,10 +41,15 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar progressBar;
     final String API_KEY = "7d20fe59c0f72a12c165f5867aa3cb70";
     final String BASE_URL = "https://api.themoviedb.org/3/movie/";
+    FavoriteDB favoriteDB;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        favoriteDB = FavoriteDB.getInstance(getApplicationContext());
+        for (int i = 0; i < favoriteDB.favoriteDao().getAll().size(); i++) {
+            System.out.println("favorite: " + favoriteDB.favoriteDao().getAll().get(i).getTitle());
+        }
         spinner_sort = (Spinner) findViewById(R.id.spinner_sort);
         final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.sort_order, android.R.layout.simple_spinner_item);
@@ -73,6 +81,11 @@ public class MainActivity extends AppCompatActivity {
         getImages("popular");
         toast = Toast.makeText(this,
                 "Error retrieving data", Toast.LENGTH_LONG);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     public void getImages(String query) {

@@ -1,5 +1,11 @@
 package android.example.popularmoviespt1;
 
+//import android.example.popularmoviespt1.utils.Favorite;
+//import android.example.popularmoviespt1.utils.FavoriteDB;
+//import android.example.popularmoviespt1.utils.FavoriteExecutor;
+import android.example.popularmoviespt1.utils.Favorite;
+import android.example.popularmoviespt1.utils.FavoriteDB;
+import android.example.popularmoviespt1.utils.FavoriteExecutor;
 import android.example.popularmoviespt1.utils.Movie;
 import android.example.popularmoviespt1.utils.Review;
 import android.example.popularmoviespt1.utils.ReviewsRecyclerViewAdapter;
@@ -41,10 +47,17 @@ public class DetailsActivity extends AppCompatActivity {
     ProgressBar reviewsProgressBar;
     RecyclerView reviews;
     ImageView emptyStar, goldStar;
+    String title;
+    String rating;
+    String summary;
+    String releaseDate;
+    String posterPath;
+    FavoriteDB favoriteDB;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
+        favoriteDB = FavoriteDB.getInstance(getApplicationContext());
         ImageView imageView = (ImageView) findViewById(R.id.iv_poster_thumbnail);
         TextView tv_title = (TextView) findViewById(R.id.tv_title);
         TextView tv_rating = (TextView) findViewById(R.id.tv_rating);
@@ -62,16 +75,16 @@ public class DetailsActivity extends AppCompatActivity {
         Serializable serializableMovie = getIntent().getSerializableExtra("movie");
         if (serializableMovie != null) {
             Movie movie = (Movie) serializableMovie;
-            String poster_path = movie.getPosterURL();
+            posterPath = movie.getPosterURL();
             Picasso.get()
-                    .load(poster_path)
+                    .load(posterPath)
                     .placeholder(R.mipmap.ic_launcher)
                     .into(imageView);
             id = movie.getId();
-            String title = movie.getTitle();
-            String rating = movie.getRating() + "/10";
-            String summary = movie.getOverview();
-            String releaseDate = movie.getReleaseDate().substring(0, 4);
+            title = movie.getTitle();
+            rating = movie.getRating() + "/10";
+            summary = movie.getOverview();
+            releaseDate = movie.getReleaseDate().substring(0, 4);
 
             tv_title.setText(title);
             tv_rating.setText(rating);
@@ -91,6 +104,13 @@ public class DetailsActivity extends AppCompatActivity {
         reviews.setVisibility(View.INVISIBLE);
         reviews.setLayoutManager(new LinearLayoutManager(this));
         reviews.setAdapter(new ReviewsRecyclerViewAdapter(new ArrayList<Review>()));
+        for (int i = 0; i < favoriteDB.favoriteDao().getAll().size(); i++) {
+            String favorite_title = favoriteDB.favoriteDao().getAll().get(i).getTitle();
+            if (title.equals(favorite_title)) {
+                goldStar.setVisibility(View.VISIBLE);
+                emptyStar.setVisibility(View.INVISIBLE);
+            }
+        }
     }
 
     @Override
@@ -102,12 +122,34 @@ public class DetailsActivity extends AppCompatActivity {
     public void isFavorite(View v) {
         goldStar.setVisibility(View.VISIBLE);
         emptyStar.setVisibility(View.INVISIBLE);
-
+        boolean isFavorite = false;
+        final Favorite favorite = new Favorite(title, rating, summary, releaseDate, posterPath);
+        for (int i = 0; i < favoriteDB.favoriteDao().getAll().size(); i++) {
+            String favorite_title = favoriteDB.favoriteDao().getAll().get(i).getTitle();
+            if (favorite.getTitle().equals(favorite_title)) {
+                isFavorite = true;
+            }
+        }
+        if (!isFavorite) {
+            FavoriteExecutor.getInstance().getDiskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    favoriteDB.favoriteDao().addFavorite(favorite);
+                }
+            });
+        }
     }
 
     public void notFavorite(View v) {
         goldStar.setVisibility(View.INVISIBLE);
         emptyStar.setVisibility(View.VISIBLE);
+        final Favorite favorite = new Favorite(title, rating, summary, releaseDate, posterPath);
+        FavoriteExecutor.getInstance().getDiskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                favoriteDB.favoriteDao().deleteFavorite(favorite);
+            }
+        });
     }
 
     public void getReviews() {
