@@ -1,7 +1,10 @@
 package android.example.popularmoviespt1;
 
 import android.content.res.Configuration;
+import android.example.popularmoviespt1.utils.Favorite;
 import android.example.popularmoviespt1.utils.FavoriteDB;
+import android.example.popularmoviespt1.utils.FavoriteExecutor;
+import android.example.popularmoviespt1.utils.FavoriteRecyclerViewAdapter;
 import android.example.popularmoviespt1.utils.Movie;
 import android.example.popularmoviespt1.utils.MoviesRecyclerViewAdapter;
 import android.os.Bundle;
@@ -29,27 +32,31 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-
-//import android.example.popularmoviespt1.utils.FavoriteDB;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     JSONObject jsonObject;
     JSONArray jsonArray;
     Toast toast;
     RecyclerView movies;
+    RecyclerView rvFavorites;
     Spinner spinner_sort;
     ProgressBar progressBar;
     final String API_KEY = "7d20fe59c0f72a12c165f5867aa3cb70";
     final String BASE_URL = "https://api.themoviedb.org/3/movie/";
     FavoriteDB favoriteDB;
+    List<Favorite> favoriteList;
+    ArrayList<Favorite> favoriteArrayList;
+    boolean isPopular;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         favoriteDB = FavoriteDB.getInstance(getApplicationContext());
-        for (int i = 0; i < favoriteDB.favoriteDao().getAll().size(); i++) {
-            System.out.println("favorite: " + favoriteDB.favoriteDao().getAll().get(i).getTitle());
-        }
+        favoriteList = favoriteDB.favoriteDao().getAll();
+        favoriteArrayList = (ArrayList<Favorite>) favoriteList;
         spinner_sort = (Spinner) findViewById(R.id.spinner_sort);
         final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.sort_order, android.R.layout.simple_spinner_item);
@@ -60,11 +67,14 @@ public class MainActivity extends AppCompatActivity {
         spinner_sort.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if (i == 1) {
+                if (i == 2) {
                     getImages("top_rated");
                 }
-                if (i == 0) {
+                if (i == 1) {
                     getImages("popular");
+                }
+                if (i == 0) {
+                    getFavorites();
                 }
             }
 
@@ -74,21 +84,45 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         progressBar = (ProgressBar) findViewById(R.id.movies_progress_bar);
+        rvFavorites = (RecyclerView) findViewById(R.id.rv_favorites);
+        rvFavorites.setVisibility(View.INVISIBLE);
         movies = (RecyclerView) findViewById(R.id.rv_movies);
         movies.setVisibility(View.INVISIBLE);
-        movies.setLayoutManager(new GridLayoutManager(this, 2));
-        movies.setAdapter(new MoviesRecyclerViewAdapter(new ArrayList<Movie>()));
-        getImages("popular");
+        getFavorites();
         toast = Toast.makeText(this,
                 "Error retrieving data", Toast.LENGTH_LONG);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    public void getFavorites() {
+        movies.setVisibility(View.INVISIBLE);
+        rvFavorites.setLayoutManager(new GridLayoutManager(this, 2));
+        FavoriteExecutor.getInstance().getDiskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                favoriteArrayList = (ArrayList<Favorite>) favoriteDB.favoriteDao().getAll();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        rvFavorites.setAdapter(new FavoriteRecyclerViewAdapter(favoriteArrayList));
+                    }
+                });
+            }
+        });
+        progressBar.setVisibility(View.GONE);
+        if (getApplicationContext().getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE) {
+            LinearLayoutManager llm = new LinearLayoutManager(getParent());
+            llm.canScrollHorizontally();
+            llm.setOrientation(RecyclerView.HORIZONTAL);
+            rvFavorites.setLayoutManager(llm);
+            rvFavorites.setHasFixedSize(true);
+        }
+        rvFavorites.setVisibility(View.VISIBLE);
     }
 
     public void getImages(String query) {
+        isPopular = query.equals("popular");
+        rvFavorites.setVisibility(View.INVISIBLE);
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         String URL = BASE_URL + query + "?api_key=" + API_KEY;
         final ArrayList<Movie> moviesList = new ArrayList<>();
@@ -116,7 +150,8 @@ public class MainActivity extends AppCompatActivity {
                             //create new adapter
                             MoviesRecyclerViewAdapter newAdapter =
                                     new MoviesRecyclerViewAdapter(moviesList);
-                            movies.swapAdapter(newAdapter,true);
+                            movies.setAdapter(newAdapter);
+                            movies.setLayoutManager(new GridLayoutManager(getApplicationContext(), 2));
                             progressBar.setVisibility(View.GONE);
                             movies.setVisibility(View.VISIBLE);
                             if (getApplicationContext().getResources().getConfiguration().orientation

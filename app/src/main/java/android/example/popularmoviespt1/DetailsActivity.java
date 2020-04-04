@@ -3,6 +3,7 @@ package android.example.popularmoviespt1;
 //import android.example.popularmoviespt1.utils.Favorite;
 //import android.example.popularmoviespt1.utils.FavoriteDB;
 //import android.example.popularmoviespt1.utils.FavoriteExecutor;
+
 import android.example.popularmoviespt1.utils.Favorite;
 import android.example.popularmoviespt1.utils.FavoriteDB;
 import android.example.popularmoviespt1.utils.FavoriteExecutor;
@@ -74,17 +75,32 @@ public class DetailsActivity extends AppCompatActivity {
 
         Serializable serializableMovie = getIntent().getSerializableExtra("movie");
         if (serializableMovie != null) {
-            Movie movie = (Movie) serializableMovie;
-            posterPath = movie.getPosterURL();
-            Picasso.get()
-                    .load(posterPath)
-                    .placeholder(R.mipmap.ic_launcher)
-                    .into(imageView);
-            id = movie.getId();
-            title = movie.getTitle();
-            rating = movie.getRating() + "/10";
-            summary = movie.getOverview();
-            releaseDate = movie.getReleaseDate().substring(0, 4);
+            if (serializableMovie.getClass() == Movie.class) {
+                Movie movie = (Movie) serializableMovie;
+                posterPath = movie.getPosterURL();
+                Picasso.get()
+                        .load(posterPath)
+                        .placeholder(R.mipmap.ic_launcher)
+                        .into(imageView);
+                id = movie.getId();
+                title = movie.getTitle();
+                rating = movie.getRating() + "/10";
+                summary = movie.getOverview();
+                releaseDate = movie.getReleaseDate().substring(0, 4);
+            }
+            else if (serializableMovie.getClass() == Favorite.class) {
+                Favorite movie = (Favorite) serializableMovie;
+                posterPath = movie.getPoster_url();
+                Picasso.get()
+                        .load(posterPath)
+                        .placeholder(R.mipmap.ic_launcher)
+                        .into(imageView);
+                id = movie.getId();
+                title = movie.getTitle();
+                rating = movie.getRating() + "/10";
+                summary = movie.getOverview();
+                releaseDate = movie.getReleaseDate().substring(0, 4);
+            }
 
             tv_title.setText(title);
             tv_rating.setText(rating);
@@ -123,7 +139,7 @@ public class DetailsActivity extends AppCompatActivity {
         goldStar.setVisibility(View.VISIBLE);
         emptyStar.setVisibility(View.INVISIBLE);
         boolean isFavorite = false;
-        final Favorite favorite = new Favorite(title, rating, summary, releaseDate, posterPath);
+        final Favorite favorite = new Favorite(title, id, summary, rating, releaseDate, posterPath);
         for (int i = 0; i < favoriteDB.favoriteDao().getAll().size(); i++) {
             String favorite_title = favoriteDB.favoriteDao().getAll().get(i).getTitle();
             if (favorite.getTitle().equals(favorite_title)) {
@@ -143,7 +159,7 @@ public class DetailsActivity extends AppCompatActivity {
     public void notFavorite(View v) {
         goldStar.setVisibility(View.INVISIBLE);
         emptyStar.setVisibility(View.VISIBLE);
-        final Favorite favorite = new Favorite(title, rating, summary, releaseDate, posterPath);
+        final Favorite favorite = new Favorite(title, id, summary, rating, releaseDate, posterPath);
         FavoriteExecutor.getInstance().getDiskIO().execute(new Runnable() {
             @Override
             public void run() {

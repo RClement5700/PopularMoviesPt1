@@ -15,29 +15,27 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter
-        <MoviesRecyclerViewAdapter.MoviesRecyclerViewHolder> {
+public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter
+        <FavoriteRecyclerViewAdapter.FavoriteRecyclerViewHolder> {
 
-    ArrayList<Movie> movies;
+    ArrayList<Favorite> favorites;
 
-    public MoviesRecyclerViewAdapter(ArrayList<Movie> movies) {
-        this.movies = movies;
+    public FavoriteRecyclerViewAdapter(ArrayList<Favorite> favorites) {
+        this.favorites = favorites;
     }
-
-
 
     @NonNull
     @Override
-    public MoviesRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public FavoriteRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.movie_list_item, parent, false);
-        return new MoviesRecyclerViewHolder(view);
+        return new FavoriteRecyclerViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final MoviesRecyclerViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final FavoriteRecyclerViewHolder holder, final int position) {
         Picasso.get()
-                .load(movies.get(position).posterURL)
+                .load(favorites.get(position).getPoster_url())
                 .placeholder(R.mipmap.ic_launcher)
                 .into(holder.imageView);
         holder.imageView.setClickable(true);
@@ -46,7 +44,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), DetailsActivity.class);
-                intent.putExtra("movie", movies.get(position));
+                intent.putExtra("movie", favorites.get(position));
                 v.getContext().startActivity(intent);
             }
         });
@@ -54,18 +52,16 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter
 
     @Override
     public int getItemCount() {
-        return movies.size();
+        return favorites.size();
     }
 
 
-    class MoviesRecyclerViewHolder extends RecyclerView.ViewHolder {
+    class FavoriteRecyclerViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
 
-        public MoviesRecyclerViewHolder(@NonNull View itemView) {
+        public FavoriteRecyclerViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.iv_movie_poster);
-
         }
-
     }
 }
