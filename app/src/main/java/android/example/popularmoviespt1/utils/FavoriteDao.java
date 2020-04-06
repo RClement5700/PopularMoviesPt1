@@ -1,5 +1,6 @@
 package android.example.popularmoviespt1.utils;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -13,7 +14,7 @@ import java.util.List;
 public interface FavoriteDao {
 
     @Query("SELECT * FROM favorite")
-    List<Favorite> getAll();
+    LiveData<List<Favorite>> getAll();
 
 //    @Query("SELECT * FROM favorite WHERE title IN (:titles)")
 //    List<Favorite>getTitles(String titles);

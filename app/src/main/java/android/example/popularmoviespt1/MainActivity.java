@@ -3,7 +3,6 @@ package android.example.popularmoviespt1;
 import android.content.res.Configuration;
 import android.example.popularmoviespt1.utils.Favorite;
 import android.example.popularmoviespt1.utils.FavoriteDB;
-import android.example.popularmoviespt1.utils.FavoriteExecutor;
 import android.example.popularmoviespt1.utils.FavoriteRecyclerViewAdapter;
 import android.example.popularmoviespt1.utils.Movie;
 import android.example.popularmoviespt1.utils.MoviesRecyclerViewAdapter;
@@ -16,6 +15,9 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
     final String API_KEY = "7d20fe59c0f72a12c165f5867aa3cb70";
     final String BASE_URL = "https://api.themoviedb.org/3/movie/";
     FavoriteDB favoriteDB;
-    List<Favorite> favoriteList;
-    ArrayList<Favorite> favoriteArrayList;
+    LiveData<List<Favorite>> favoriteList;
+    //ArrayList<Favorite> favoriteArrayList;
     boolean isPopular;
 
 
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         favoriteDB = FavoriteDB.getInstance(getApplicationContext());
         favoriteList = favoriteDB.favoriteDao().getAll();
-        favoriteArrayList = (ArrayList<Favorite>) favoriteList;
+        //favoriteArrayList = (ArrayList<Favorite>) favoriteList;
         spinner_sort = (Spinner) findViewById(R.id.spinner_sort);
         final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.sort_order, android.R.layout.simple_spinner_item);
@@ -96,16 +98,12 @@ public class MainActivity extends AppCompatActivity {
     public void getFavorites() {
         movies.setVisibility(View.INVISIBLE);
         rvFavorites.setLayoutManager(new GridLayoutManager(this, 2));
-        FavoriteExecutor.getInstance().getDiskIO().execute(new Runnable() {
+        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        //favoriteList = favoriteDB.favoriteDao().getAll();
+        viewModel.getFavorites().observe(this, new Observer<List<Favorite>>() {
             @Override
-            public void run() {
-                favoriteArrayList = (ArrayList<Favorite>) favoriteDB.favoriteDao().getAll();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        rvFavorites.setAdapter(new FavoriteRecyclerViewAdapter(favoriteArrayList));
-                    }
-                });
+            public void onChanged(List<Favorite> favorites) {
+                rvFavorites.setAdapter(new FavoriteRecyclerViewAdapter(favorites));
             }
         });
         progressBar.setVisibility(View.GONE);

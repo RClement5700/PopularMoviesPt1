@@ -6,7 +6,6 @@ package android.example.popularmoviespt1;
 
 import android.example.popularmoviespt1.utils.Favorite;
 import android.example.popularmoviespt1.utils.FavoriteDB;
-import android.example.popularmoviespt1.utils.FavoriteExecutor;
 import android.example.popularmoviespt1.utils.Movie;
 import android.example.popularmoviespt1.utils.Review;
 import android.example.popularmoviespt1.utils.ReviewsRecyclerViewAdapter;
@@ -20,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -37,6 +37,7 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DetailsActivity extends AppCompatActivity {
 
@@ -120,13 +121,19 @@ public class DetailsActivity extends AppCompatActivity {
         reviews.setVisibility(View.INVISIBLE);
         reviews.setLayoutManager(new LinearLayoutManager(this));
         reviews.setAdapter(new ReviewsRecyclerViewAdapter(new ArrayList<Review>()));
-        for (int i = 0; i < favoriteDB.favoriteDao().getAll().size(); i++) {
-            String favorite_title = favoriteDB.favoriteDao().getAll().get(i).getTitle();
-            if (title.equals(favorite_title)) {
-                goldStar.setVisibility(View.VISIBLE);
-                emptyStar.setVisibility(View.INVISIBLE);
+        favoriteDB.favoriteDao().getAll().observe(this, new Observer<List<Favorite>>() {
+            @Override
+            public void onChanged(List<Favorite> favorites) {
+                for (int i = 0; i < favorites.size(); i++) {
+                    String favorite_title = favorites.get(i).getTitle();
+                    if (title.equals(favorite_title)) {
+                        goldStar.setVisibility(View.VISIBLE);
+                        emptyStar.setVisibility(View.INVISIBLE);
+                    }
+                }
             }
-        }
+        });
+
     }
 
     @Override
@@ -138,32 +145,23 @@ public class DetailsActivity extends AppCompatActivity {
     public void isFavorite(View v) {
         goldStar.setVisibility(View.VISIBLE);
         emptyStar.setVisibility(View.INVISIBLE);
-        boolean isFavorite = false;
         final Favorite favorite = new Favorite(title, id, summary, rating, releaseDate, posterPath);
-        for (int i = 0; i < favoriteDB.favoriteDao().getAll().size(); i++) {
-            String favorite_title = favoriteDB.favoriteDao().getAll().get(i).getTitle();
-            if (favorite.getTitle().equals(favorite_title)) {
-                isFavorite = true;
+        favoriteDB.favoriteDao().getAll().observe(this, new Observer<List<Favorite>>() {
+            @Override
+            public void onChanged(List<Favorite> favorites) {
+                favorites.add(favorite);
             }
-        }
-        if (!isFavorite) {
-            FavoriteExecutor.getInstance().getDiskIO().execute(new Runnable() {
-                @Override
-                public void run() {
-                    favoriteDB.favoriteDao().addFavorite(favorite);
-                }
-            });
-        }
+        });
     }
 
     public void notFavorite(View v) {
         goldStar.setVisibility(View.INVISIBLE);
         emptyStar.setVisibility(View.VISIBLE);
         final Favorite favorite = new Favorite(title, id, summary, rating, releaseDate, posterPath);
-        FavoriteExecutor.getInstance().getDiskIO().execute(new Runnable() {
+        favoriteDB.favoriteDao().getAll().observe(this, new Observer<List<Favorite>>() {
             @Override
-            public void run() {
-                favoriteDB.favoriteDao().deleteFavorite(favorite);
+            public void onChanged(List<Favorite> favorites) {
+                favorites.remove(favorite);
             }
         });
     }

@@ -13,14 +13,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class FavoriteRecyclerViewAdapter extends RecyclerView.Adapter
         <FavoriteRecyclerViewAdapter.FavoriteRecyclerViewHolder> {
 
-    ArrayList<Favorite> favorites;
+    List<Favorite> favorites;
 
-    public FavoriteRecyclerViewAdapter(ArrayList<Favorite> favorites) {
+    public FavoriteRecyclerViewAdapter(List<Favorite> favorites) {
         this.favorites = favorites;
     }
 
