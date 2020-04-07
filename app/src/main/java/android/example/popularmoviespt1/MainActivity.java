@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView rvFavorites;
     Spinner spinner_sort;
     ProgressBar progressBar;
-    final String API_KEY = "7d20fe59c0f72a12c165f5867aa3cb70";
+    final String API_KEY = "";
     final String BASE_URL = "https://api.themoviedb.org/3/movie/";
     FavoriteDB favoriteDB;
     boolean viewFavorite, viewPopular, viewTopRated;
