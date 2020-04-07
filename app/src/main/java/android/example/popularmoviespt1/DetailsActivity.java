@@ -6,6 +6,7 @@ package android.example.popularmoviespt1;
 
 import android.example.popularmoviespt1.utils.Favorite;
 import android.example.popularmoviespt1.utils.FavoriteDB;
+import android.example.popularmoviespt1.utils.FavoriteExecutor;
 import android.example.popularmoviespt1.utils.Movie;
 import android.example.popularmoviespt1.utils.Review;
 import android.example.popularmoviespt1.utils.ReviewsRecyclerViewAdapter;
@@ -19,7 +20,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -54,7 +54,10 @@ public class DetailsActivity extends AppCompatActivity {
     String summary;
     String releaseDate;
     String posterPath;
+    boolean isFavorite;
     FavoriteDB favoriteDB;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,19 +124,15 @@ public class DetailsActivity extends AppCompatActivity {
         reviews.setVisibility(View.INVISIBLE);
         reviews.setLayoutManager(new LinearLayoutManager(this));
         reviews.setAdapter(new ReviewsRecyclerViewAdapter(new ArrayList<Review>()));
-        favoriteDB.favoriteDao().getAll().observe(this, new Observer<List<Favorite>>() {
-            @Override
-            public void onChanged(List<Favorite> favorites) {
-                for (int i = 0; i < favorites.size(); i++) {
-                    String favorite_title = favorites.get(i).getTitle();
-                    if (title.equals(favorite_title)) {
-                        goldStar.setVisibility(View.VISIBLE);
-                        emptyStar.setVisibility(View.INVISIBLE);
-                    }
+        List<Favorite> favorites = favoriteDB.favoriteDao().getAll();
+        if (favorites!=null) {
+            for (int i = 0; i < favorites.size(); i++) {
+                if (favorites.get(i).getTitle().equals(title)) {
+                    goldStar.setVisibility(View.VISIBLE);
+                    emptyStar.setVisibility(View.INVISIBLE);
                 }
             }
-        });
-
+        }
     }
 
     @Override
@@ -143,27 +142,38 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     public void isFavorite(View v) {
+        isFavorite = true;
         goldStar.setVisibility(View.VISIBLE);
         emptyStar.setVisibility(View.INVISIBLE);
         final Favorite favorite = new Favorite(title, id, summary, rating, releaseDate, posterPath);
-        favoriteDB.favoriteDao().getAll().observe(this, new Observer<List<Favorite>>() {
-            @Override
-            public void onChanged(List<Favorite> favorites) {
-                favorites.add(favorite);
-            }
-        });
+        final List<Favorite> favorites = favoriteDB.favoriteDao().getAll();
+        for (Favorite thisFavorite: favorites) {
+            if (thisFavorite != favorite) isFavorite = false;
+        }
+        if (!isFavorite) {
+            FavoriteExecutor.getInstance().getDiskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    favoriteDB.favoriteDao().addFavorite(favorite);
+                }
+            });
+        }
+
     }
 
     public void notFavorite(View v) {
+        isFavorite = false;
         goldStar.setVisibility(View.INVISIBLE);
         emptyStar.setVisibility(View.VISIBLE);
         final Favorite favorite = new Favorite(title, id, summary, rating, releaseDate, posterPath);
-        favoriteDB.favoriteDao().getAll().observe(this, new Observer<List<Favorite>>() {
+        List<Favorite> favorites = favoriteDB.favoriteDao().getAll();
+        FavoriteExecutor.getInstance().getDiskIO().execute(new Runnable() {
             @Override
-            public void onChanged(List<Favorite> favorites) {
-                favorites.remove(favorite);
+            public void run() {
+                favoriteDB.favoriteDao().deleteFavorite(favorite);
             }
         });
+
     }
 
     public void getReviews() {

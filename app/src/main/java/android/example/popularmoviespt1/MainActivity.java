@@ -15,9 +15,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -47,18 +44,15 @@ public class MainActivity extends AppCompatActivity {
     final String API_KEY = "7d20fe59c0f72a12c165f5867aa3cb70";
     final String BASE_URL = "https://api.themoviedb.org/3/movie/";
     FavoriteDB favoriteDB;
-    LiveData<List<Favorite>> favoriteList;
-    //ArrayList<Favorite> favoriteArrayList;
-    boolean isPopular;
+    boolean viewFavorite, viewPopular, viewTopRated;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        viewFavorite = true;
         favoriteDB = FavoriteDB.getInstance(getApplicationContext());
-        favoriteList = favoriteDB.favoriteDao().getAll();
-        //favoriteArrayList = (ArrayList<Favorite>) favoriteList;
         spinner_sort = (Spinner) findViewById(R.id.spinner_sort);
         final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.sort_order, android.R.layout.simple_spinner_item);
@@ -71,12 +65,22 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 if (i == 2) {
                     getImages("top_rated");
+                    viewFavorite = false;
+                    viewPopular = false;
+                    viewTopRated = true;
+
                 }
                 if (i == 1) {
                     getImages("popular");
+                    viewFavorite = false;
+                    viewPopular = true;
+                    viewTopRated = false;
                 }
                 if (i == 0) {
                     getFavorites();
+                    viewFavorite = true;
+                    viewPopular = false;
+                    viewTopRated = true;
                 }
             }
 
@@ -87,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         });
         progressBar = (ProgressBar) findViewById(R.id.movies_progress_bar);
         rvFavorites = (RecyclerView) findViewById(R.id.rv_favorites);
+        rvFavorites.setLayoutManager(new GridLayoutManager(this, 2));
         rvFavorites.setVisibility(View.INVISIBLE);
         movies = (RecyclerView) findViewById(R.id.rv_movies);
         movies.setVisibility(View.INVISIBLE);
@@ -95,18 +100,19 @@ public class MainActivity extends AppCompatActivity {
                 "Error retrieving data", Toast.LENGTH_LONG);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (viewFavorite) getFavorites();
+        else if (viewPopular) getImages("popular");
+        else if (viewTopRated) getImages("top_rated");
+    }
+
     public void getFavorites() {
         movies.setVisibility(View.INVISIBLE);
-        rvFavorites.setLayoutManager(new GridLayoutManager(this, 2));
-        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        //favoriteList = favoriteDB.favoriteDao().getAll();
-        viewModel.getFavorites().observe(this, new Observer<List<Favorite>>() {
-            @Override
-            public void onChanged(List<Favorite> favorites) {
-                rvFavorites.setAdapter(new FavoriteRecyclerViewAdapter(favorites));
-            }
-        });
         progressBar.setVisibility(View.GONE);
+        List<Favorite> favorites = favoriteDB.favoriteDao().getAll();
+        rvFavorites.setAdapter(new FavoriteRecyclerViewAdapter(favorites));
         if (getApplicationContext().getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE) {
             LinearLayoutManager llm = new LinearLayoutManager(getParent());
@@ -119,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getImages(String query) {
-        isPopular = query.equals("popular");
         rvFavorites.setVisibility(View.INVISIBLE);
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         String URL = BASE_URL + query + "?api_key=" + API_KEY;

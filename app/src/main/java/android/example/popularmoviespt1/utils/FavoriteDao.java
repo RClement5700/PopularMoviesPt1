@@ -14,13 +14,13 @@ import java.util.List;
 public interface FavoriteDao {
 
     @Query("SELECT * FROM favorite")
-    LiveData<List<Favorite>> getAll();
-
-//    @Query("SELECT * FROM favorite WHERE title IN (:titles)")
-//    List<Favorite>getTitles(String titles);
+    List<Favorite> getAll();
 
     @Insert
     void addFavorite(Favorite favorite);
+
+    @Query("SELECT * FROM favorite WHERE title = :title")
+    LiveData<Favorite> loadFavoriteByTitle(String title);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateFavorite(Favorite favorite);
